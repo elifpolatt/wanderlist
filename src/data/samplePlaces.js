@@ -17,7 +17,7 @@ const samplePlaces = [
 
   {
     id: 2,
-    city: "Aurora Borealis",
+    city: "Tromse",
     country: "Norveç",
     lat: 69.6492,
     lng: 18.9553,
