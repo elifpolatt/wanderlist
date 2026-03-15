@@ -134,5 +134,5 @@ This project helped practice:
   
 # 🚀 Live Demo
 
-https://wanderlist.netlify.app
+https://wanderlist-map.netlify.app
 
