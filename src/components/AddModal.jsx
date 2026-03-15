@@ -13,57 +13,139 @@ function AddModal({ coord, darkMode, onSave, onClose }) {
     onSave({ ...form, lat:coord.lat, lng:coord.lng });
   };
 
-  const t = darkMode
-    ? { overlay:"rgba(0,0,0,0.72)", modal:"#111827", border:"rgba(255,255,255,0.1)", title:"#e2ddd6", input:"#1a2235", inputBorder:"rgba(255,255,255,0.1)", text:"#e2ddd6", label:"#9ca3af", hint:"rgba(201,168,76,0.06)", hintBorder:"rgba(201,168,76,0.15)", hintColor:"#9ca3af" }
-    : { overlay:"rgba(0,0,0,0.45)", modal:"#ffffff", border:"rgba(0,0,0,0.1)",       title:"#1a1a2e", input:"#f5f7fa", inputBorder:"rgba(0,0,0,0.12)",       text:"#1a1a2e", label:"#6b7280", hint:"rgba(201,168,76,0.06)", hintBorder:"rgba(201,168,76,0.2)",  hintColor:"#6b7280" };
+  // Ortak input class'i — her input - select - textarea icin kullanilir
+  const inputClass = `
+    w-full px-3 py-2 rounded-lg text-sm outline-none
+    border transition-all duration-200
+    ${darkMode
+      ? "bg-[#1a2235] border-white/10 text-gray-100 placeholder-gray-500"
+      : "bg-gray-50  border-black/10  text-gray-900 placeholder-gray-400"
+    }
+    focus:border-[#c9a84c]
+  `;
+
+  const labelClass = `
+    block text-[0.7rem] tracking-widest uppercase mb-1
+    ${darkMode ? "text-gray-400" : "text-gray-500"}
+  `;
 
   return (
-    <div style={{ position:"fixed", inset:0, background:t.overlay, backdropFilter:"blur(5px)", display:"flex", alignItems:"center", justifyContent:"center", zIndex:2000 }}>
-      <div style={{ background:t.modal, border:`1px solid ${t.border}`, borderRadius:18, padding:"1.8rem", width:"min(420px,95vw)", boxShadow:"0 20px 60px rgba(0,0,0,0.5)", transition:"all 0.3s" }}>
+    <div className={`
+      fixed inset-0 flex items-center justify-center z-[2000]
+      backdrop-blur-md
+      ${darkMode ? "bg-black/70" : "bg-black/45"}
+    `}>
 
-        <div style={{ fontFamily:"Georgia,serif", fontSize:"1.3rem", fontWeight:700, color:t.title, marginBottom:8 }}>✈️ Yeni Yer Ekle</div>
+      {/* MODAL KUTUSU */}
+      <div className={`
+        rounded-2xl p-7 w-[min(420px,95vw)] shadow-2xl
+        border transition-all duration-300
+        ${darkMode
+          ? "bg-[#111827] border-white/10"
+          : "bg-white border-black/10"
+        }
+      `}>
 
-        <div style={{ fontSize:"0.75rem", color:t.hintColor, marginBottom:"1.1rem", padding:"0.5rem 0.7rem", background:t.hint, border:`1px solid ${t.hintBorder}`, borderRadius:8, lineHeight:1.5 }}>
+        {/* Baslik */}
+        <div className={`font-serif text-xl font-bold mb-2 ${darkMode ? "text-gray-100" : "text-gray-900"}`}>
+          ✈️ Yeni Yer Ekle
+        </div>
+
+        {/* Koordinat / ulke bilgisi */}
+        <div className={`
+          text-[0.75rem] mb-4 px-3 py-2 rounded-lg leading-relaxed
+          border
+          ${darkMode
+            ? "bg-[#c9a84c]/5 border-[#c9a84c]/20 text-gray-400"
+            : "bg-[#c9a84c]/5 border-[#c9a84c]/25 text-gray-500"
+          }
+        `}>
           📍 {coord.lat.toFixed(3)}, {coord.lng.toFixed(3)}
           {coord.country
-            ? <span style={{ color:"#4caf84", fontWeight:500 }}> · 🌍 {coord.country} tespit edildi</span>
-            : <span style={{ color:"#e8774a" }}> · Okyanus, ülkeyi kendin gir</span>
+            ? <span className="text-[#4caf84] font-medium"> · 🌍 {coord.country} tespit edildi</span>
+            : <span className="text-[#e8774a]"> · Okyanus, ulkeyi kendin gir</span>
           }
         </div>
 
-        {[["Şehir / Yer Adı *","city","text","örn. Tokyo..."],["Ülke *","country","text","örn. Japonya"]].map(([lbl,key,type,ph])=>(
-          <div key={key} style={{ marginBottom:"0.8rem" }}>
-            <label style={{ display:"block", fontSize:"0.7rem", letterSpacing:"0.08em", textTransform:"uppercase", color:t.label, marginBottom:5 }}>
-              {lbl} {key==="country"&&coord.country&&<span style={{ color:"#4caf84", textTransform:"none", letterSpacing:0, fontSize:"0.68rem" }}>(otomatik)</span>}
-            </label>
-            <input type={type} placeholder={ph} value={form[key]}
-              onChange={e=>setForm({...form,[key]:e.target.value})}
-              autoFocus={key==="city"}
-              style={{ width:"100%", padding:"0.6rem 0.8rem", background:t.input, border:`1px solid ${key==="country"&&coord.country?"rgba(76,175,132,0.4)":t.inputBorder}`, borderRadius:9, color:t.text, fontSize:"0.9rem", outline:"none", fontFamily:"inherit", boxSizing:"border-box" }}
-            />
-          </div>
-        ))}
+        {/* Sehir */}
+        <div className="mb-3">
+          <label className={labelClass}>Sehir / Yer Adi *</label>
+          <input
+            type="text"
+            placeholder="orn. Tokyo..."
+            value={form.city}
+            autoFocus
+            onChange={e => setForm({...form, city: e.target.value})}
+            className={inputClass}
+          />
+        </div>
 
-        <div style={{ marginBottom:"0.8rem" }}>
-          <label style={{ display:"block", fontSize:"0.7rem", letterSpacing:"0.08em", textTransform:"uppercase", color:t.label, marginBottom:5 }}>Durum</label>
-          <select value={form.status} onChange={e=>setForm({...form,status:e.target.value})}
-            style={{ width:"100%", padding:"0.6rem 0.8rem", background:t.input, border:`1px solid ${t.inputBorder}`, borderRadius:9, color:t.text, fontSize:"0.9rem", outline:"none", fontFamily:"inherit" }}>
-            <option value="wish">🧡 Gitmek İstiyorum</option>
+        {/* Ulke */}
+        <div className="mb-3">
+          <label className={labelClass}>
+            Ulke *
+            {coord.country && (
+              <span className="text-[#4caf84] normal-case tracking-normal text-[0.68rem] ml-1">(otomatik)</span>
+            )}
+          </label>
+          <input
+            type="text"
+            placeholder="orn. Japonya"
+            value={form.country}
+            onChange={e => setForm({...form, country: e.target.value})}
+            className={`${inputClass} ${coord.country ? "border-[#4caf84]/40" : ""}`}
+          />
+        </div>
+
+        {/* Durum */}
+        <div className="mb-3">
+          <label className={labelClass}>Durum</label>
+          <select
+            value={form.status}
+            onChange={e => setForm({...form, status: e.target.value})}
+            className={inputClass}
+          >
+            <option value="wish">🧡 Gitmek Istiyorum</option>
             <option value="visited">✅ Gittim</option>
           </select>
         </div>
 
-        <div style={{ marginBottom:"1rem" }}>
-          <label style={{ display:"block", fontSize:"0.7rem", letterSpacing:"0.08em", textTransform:"uppercase", color:t.label, marginBottom:5 }}>İlk Notun (opsiyonel)</label>
-          <textarea placeholder="Bu yeri neden görmek istiyorsun?..." value={form.note}
-            onChange={e=>setForm({...form,note:e.target.value})}
-            style={{ width:"100%", padding:"0.6rem 0.8rem", background:t.input, border:`1px solid ${t.inputBorder}`, borderRadius:9, color:t.text, fontSize:"0.9rem", outline:"none", fontFamily:"inherit", resize:"vertical", minHeight:65, boxSizing:"border-box" }}
+        {/* Not */}
+        <div className="mb-5">
+          <label className={labelClass}>Ilk Notun (opsiyonel)</label>
+          <textarea
+            placeholder="Bu yeri neden gormek istiyorsun?..."
+            value={form.note}
+            onChange={e => setForm({...form, note: e.target.value})}
+            className={`${inputClass} resize-y min-h-[65px]`}
           />
         </div>
 
-        <div style={{ display:"flex", gap:8 }}>
-          <button onClick={onClose} style={{ flex:1, padding:"0.65rem", background:"transparent", border:`1px solid ${t.border}`, borderRadius:9, color:t.label, fontSize:"0.88rem", cursor:"pointer", fontFamily:"inherit" }}>İptal</button>
-          <button onClick={handleSave} style={{ flex:1, padding:"0.65rem", background:"#c9a84c", border:"none", borderRadius:9, color:"#0b0f1a", fontSize:"0.88rem", fontWeight:700, cursor:"pointer", fontFamily:"inherit", opacity:(!form.city.trim()||!form.country.trim())?0.5:1, transition:"opacity 0.2s" }}>📍 Haritaya Ekle</button>
+        {/* Butonlar */}
+        <div className="flex gap-2">
+          <button
+            onClick={onClose}
+            className={`
+              flex-1 py-2.5 rounded-xl text-sm cursor-pointer
+              border bg-transparent transition-all duration-200
+              hover:opacity-80
+              ${darkMode ? "border-white/10 text-gray-400" : "border-black/10 text-gray-500"}
+            `}
+          >
+            Iptal
+          </button>
+          <button
+            onClick={handleSave}
+            className={`
+              flex-1 py-2.5 rounded-xl text-sm font-bold cursor-pointer
+              bg-[#c9a84c] text-[#0b0f1a] border-none
+              transition-opacity duration-200
+              hover:opacity-90
+              ${(!form.city.trim() || !form.country.trim()) ? "opacity-50" : "opacity-100"}
+            `}
+          >
+            📍 Haritaya Ekle
+          </button>
         </div>
       </div>
     </div>

@@ -5,7 +5,6 @@ const MIN_WIDTH     = 220;
 const MAX_WIDTH     = 560;
 const DEFAULT_WIDTH = 300;
 
-//sağ panel aslında
 function Sidebar({ places, selected, filter, darkMode, onFilterChange, onSelect, onToggleStatus, onDelete }) {
   const filtered  = filter === "all" ? places : places.filter((p) => p.status === filter);
   const [width, setWidth]       = useState(DEFAULT_WIDTH);
@@ -14,13 +13,7 @@ function Sidebar({ places, selected, filter, darkMode, onFilterChange, onSelect,
   const startX = useRef(0);
   const startW = useRef(DEFAULT_WIDTH);
 
-  const t = darkMode
-    ? { bg:"#111827", border:"rgba(255,255,255,0.07)", title:"#e2ddd6", muted:"#9ca3af", empty:"#6b7280" }
-    : { bg:"#f8f9fc", border:"rgba(0,0,0,0.08)",       title:"#1a1a2e", muted:"#6b7280", empty:"#9ca3af" };
-
-  const handleColor = dragging ? "#c9a84c" : hovered ? "rgba(201,168,76,0.6)" : (darkMode ? "rgba(255,255,255,0.12)" : "rgba(0,0,0,0.12)");
-
-  // Sürükleme başlat
+  // Surukleme baslat
   const onMouseDown = useCallback((e) => {
     e.preventDefault();
     startX.current = e.clientX;
@@ -28,108 +21,131 @@ function Sidebar({ places, selected, filter, darkMode, onFilterChange, onSelect,
     setDragging(true);
   }, [width]);
 
-  // Sürükleme devam
+  // Surukleme devam
   useEffect(() => {
     if (!dragging) return;
     const onMove = (e) => {
-      const delta = startX.current - e.clientX; // sağ panel: sola git = genişle
+      const delta = startX.current - e.clientX;
       const newW  = Math.min(MAX_WIDTH, Math.max(MIN_WIDTH, startW.current + delta));
       setWidth(newW);
     };
     const onUp = () => setDragging(false);
     window.addEventListener("mousemove", onMove);
-    window.addEventListener("mouseup",   onUp);
+    window.addEventListener("mouseup", onUp);
     return () => {
       window.removeEventListener("mousemove", onMove);
-      window.removeEventListener("mouseup",   onUp);
+      window.removeEventListener("mouseup", onUp);
     };
   }, [dragging]);
 
   return (
     <>
-      {/* Sürükleme sırasında tüm ekranı kaplayan şeffaf overlay cursor'ın kaymasını önler */}
+      {/* Surukleme sirasinda ekrani kapla — cursor kaymasini onler */}
       {dragging && (
-        <div style={{ position:"fixed", inset:0, cursor:"ew-resize", zIndex:9999, userSelect:"none" }} />
+        <div className="fixed inset-0 z-[9999] cursor-ew-resize select-none" />
       )}
 
-      <div style={{
-        width,
-        minWidth: MIN_WIDTH,
-        maxWidth: MAX_WIDTH,
-        background: t.bg,
-        borderLeft: `1px solid ${t.border}`,
-        display: "flex",
-        flexDirection: "column",
-        overflow: "hidden",
-        position: "relative",
-        flexShrink: 0,
-        transition: dragging ? "none" : "background 0.3s, width 0.05s",
-      }}>
-
-        {/* SÜRÜKLEME TUTAMACI*/}
+      {/* ANA SIDEBAR KAPSAYICI
+        Genislik JS ile kontrol edildiginden inline style kalıyor (dinamik deger)
+        Diger stiller Tailwind ile yazildi.
+      */}
+      <div
+        style={{ width, minWidth: MIN_WIDTH, maxWidth: MAX_WIDTH }}
+        className={`
+          relative flex flex-col overflow-hidden shrink-0
+          border-l
+          ${dragging ? "" : "transition-colors duration-300"}
+          ${darkMode
+            ? "bg-[#111827] border-white/10"
+            : "bg-[#f8f9fc] border-black/10"
+          }
+        `}
+      >
+        {/* SURUKLEME TUTAMACI */}
         <div
           onMouseDown={onMouseDown}
           onMouseEnter={() => setHovered(true)}
           onMouseLeave={() => setHovered(false)}
-          title="Sürükleyerek genişlet / daralt"
-          style={{
-            position: "absolute",
-            left: 0, top: 0, bottom: 0,
-            width: 8,
-            cursor: "ew-resize",
-            zIndex: 20,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
+          title="Surukleyerek genislet / daralt"
+          className="absolute left-0 top-0 bottom-0 w-2 cursor-ew-resize z-20 flex items-center justify-center"
         >
-          {/* İnce çizgi göstergesi */}
-          <div style={{
-            width: 3,
-            height: hovered || dragging ? 60 : 36,
-            borderRadius: 999,
-            background: handleColor,
-            transition: "height 0.2s, background 0.2s",
-          }} />
+          {/* Gorsel cizgi — hover/drag'de buyur ve renklenir */}
+          <div
+            className="w-0.5 rounded-full transition-all duration-200"
+            style={{
+              height: hovered || dragging ? 60 : 36,
+              background: dragging
+                ? "#c9a84c"
+                : hovered
+                  ? "rgba(201,168,76,0.6)"
+                  : darkMode
+                    ? "rgba(255,255,255,0.12)"
+                    : "rgba(0,0,0,0.12)",
+            }}
+          />
         </div>
 
-        {/* ── BAŞLIK + FİLTRE ── */}
-        <div style={{ padding:"1rem 1.1rem 0.7rem 1.3rem", borderBottom:`1px solid ${t.border}` }}>
-          <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:8 }}>
-            <div style={{ fontFamily:"Georgia,serif", fontSize:"1rem", color:t.title }}>📍 Yerlerim</div>
+        {/* BASLIK + FILTRE */}
+        <div className={`pt-4 pr-4 pb-3 pl-5 border-b ${darkMode ? "border-white/10" : "border-black/10"}`}>
+          <div className="flex items-center justify-between mb-2">
+            <div className={`font-serif text-base ${darkMode ? "text-gray-100" : "text-gray-900"}`}>
+              📍 Yerlerim
+            </div>
+            {/* Surukleme sirasinda genislik goster */}
+            {(dragging || hovered) && (
+              <span className={`text-[0.63rem] px-1.5 py-0.5 rounded ${darkMode ? "text-gray-400 bg-white/5" : "text-gray-400 bg-black/5"}`}>
+                ↔ {width}px
+              </span>
+            )}
           </div>
-          <div style={{ display:"flex", gap:4 }}>
-            {[["all","Tümü"],["wish","🧡 Hayalim"],["visited","✅ Gittim"]].map(([v,l])=>(
-              <button key={v} onClick={()=>onFilterChange(v)} style={{
-                flex:1, padding:"0.35rem 0.3rem", borderRadius:7,
-                border:`1px solid ${filter===v ? "#c9a84c" : t.border}`,
-                background: filter===v ? (darkMode?"#1a2235":"#fff8e8") : "transparent",
-                color: filter===v ? (darkMode?"#e2ddd6":"#8a6d1a") : t.muted,
-                fontSize:"0.75rem", cursor:"pointer", fontFamily:"inherit", transition:"all 0.18s",
-              }}>{l}</button>
+
+          {/* Filtre butonlari */}
+          <div className="flex gap-1">
+            {[["all","Tumu"],["wish","🧡 Hayalim"],["visited","✅ Gittim"]].map(([v, l]) => (
+              <button
+                key={v}
+                onClick={() => onFilterChange(v)}
+                className={`
+                  flex-1 py-1.5 px-1 rounded-lg text-[0.75rem] cursor-pointer
+                  border transition-all duration-200
+                  ${filter === v
+                    ? darkMode
+                      ? "bg-[#1a2235] border-[#c9a84c] text-gray-100"
+                      : "bg-[#fff8e8] border-[#c9a84c] text-[#8a6d1a]"
+                    : darkMode
+                      ? "bg-transparent border-white/10 text-gray-400 hover:border-white/20"
+                      : "bg-transparent border-black/10 text-gray-500 hover:border-black/20"
+                  }
+                `}
+              >
+                {l}
+              </button>
             ))}
           </div>
         </div>
 
-        {/* YER LİSTESİ */}
-        <div style={{ flex:1, overflowY:"auto", padding:"0.6rem 0.7rem 0.6rem 0.9rem" }}>
+        {/* YER LISTESI */}
+        <div className="flex-1 overflow-y-auto p-2.5">
           {filtered.length === 0
-            ? <div style={{ textAlign:"center", padding:"3rem 1rem", color:t.empty }}>
-                <div style={{ fontSize:"2rem", marginBottom:8 }}>🗺️</div>
-                <div style={{ fontFamily:"Georgia,serif", fontStyle:"italic", fontSize:"0.88rem", lineHeight:1.6 }}>
-                  Yer yok.<br/>Haritaya tıkla!
+            ? (
+              <div className={`text-center py-12 px-4 ${darkMode ? "text-gray-600" : "text-gray-400"}`}>
+                <div className="text-3xl mb-2">🗺️</div>
+                <div className="font-serif italic text-sm leading-relaxed">
+                  Yer yok.<br />Haritaya tikla!
                 </div>
               </div>
+            )
             : filtered.map((p) => (
-                <PlaceCard
-                  key={p.id} place={p}
-                  isSelected={selected?.id === p.id}
-                  darkMode={darkMode}
-                  onSelect={onSelect}
-                  onToggleStatus={onToggleStatus}
-                  onDelete={onDelete}
-                />
-              ))
+              <PlaceCard
+                key={p.id}
+                place={p}
+                isSelected={selected?.id === p.id}
+                darkMode={darkMode}
+                onSelect={onSelect}
+                onToggleStatus={onToggleStatus}
+                onDelete={onDelete}
+              />
+            ))
           }
         </div>
       </div>
