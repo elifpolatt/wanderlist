@@ -66,7 +66,25 @@ src
 
 ---
 
-# ⚙️ Installation
+# ⚙️ Setup and Running the Project
+
+## 📋 Requirements
+
+To run this project, make sure the following tools are installed on your system:
+
+* **Node.js** v16 or higher
+* **npm** v8 or higher
+
+You can check your installed versions with:
+
+```bash
+node -v
+npm -v
+```
+
+---
+
+## 📦 Installation
 
 Clone the repository:
 
@@ -74,16 +92,32 @@ Clone the repository:
 git clone https://github.com/YOURUSERNAME/wanderlist.git
 ```
 
-Install dependencies:
+Navigate to the project folder:
+
+```bash
+cd wanderlist
+```
+
+Install project dependencies:
 
 ```bash
 npm install
 ```
 
-Run the development server:
+---
+
+## ▶️ Run the Project
+
+Start the development server:
 
 ```bash
 npm start
+```
+
+Then open the following address in your browser:
+
+```
+http://localhost:3000
 ```
 
 
