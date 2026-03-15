@@ -24,10 +24,10 @@ This project was developed as part of a **JavaScript Web Development training pr
 ---
 
 # 🖥️ Project Screenshot
-./assets/ss1.png
-./assets/ss2.png
-./assets/ss3.png
-./assets/ss4.png
+![Ekran Goruntusu 1](assets/ss1.png)
+![Ekran Goruntusu 2](assets/ss2.png)
+![Ekran Goruntusu 3](assets/ss3.png)
+![Ekran Goruntusu 4](assets/ss4.png)
 ---
 
 # 🛠️ Technologies Used
